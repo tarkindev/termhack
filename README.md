@@ -1,48 +1,40 @@
 # termhack
 
-A tiny terminal hacking simulator. You'll be given puzzles (ciphers, codes,
-logic problems) to solve directly in your terminal — no coding knowledge
-needed to play, just to run it.
+Welcome to termhack, a tiny terminal hacking simulator that has no code involed.
+You're able to solve simple ciphers in your command line.
+The game features a small and more cryptic storyline expressed through each "Node", or puzzle.
 
-This guide assumes you've never used a terminal or run a program from source
-before. Follow it top to bottom and you'll be playing in a few minutes.
+The source code was written by TarkinDev, with AI being used to help stylize some of the text elements.
 
 ---
 
-## Step 1: Get the project onto your computer
+# How to set up the project
+This assumes you have never used a commandline in the past and do not have git set up.
 
-1. Go to the repository page: https://github.com/tarkindev/termhack
-2. Click the green **Code** button.
-3. Click **Download ZIP**.
-4. Find the downloaded ZIP file (usually in your Downloads folder) and
+## Step 1: Get the project onto your computer
+1. Click the green **Code** button.
+2. Click **Download ZIP**
+3. Find the downloaded ZIP file (usually in your Downloads folder) and
    extract/unzip it. On Windows, right-click it and choose **Extract All**.
    On Mac, just double-click it.
-5. You should now have a folder called `termhack` (or `termhack-main`)
+4. You should now have a folder called `termhack` (or `termhack-main`)
    somewhere on your computer. Remember where it is — you'll need it in
    Step 3.
+5. You can move termhack out of your downloads folder to a more convenient location if you would like.
 
 ## Step 2: Install Lua
 
-The game is written in a language called Lua, so you need a Lua interpreter
-installed to run it. Pick your operating system below.
+The game is written in the Lua language, thus a lua interpereter is required to run it.
 
 ### Windows
 
-1. Go to https://luabinaries.sourceforge.net/ or, easier, install via
-   **winget** (built into modern Windows):
-   - Press the **Start** menu, type `PowerShell`, open it.
-   - Type this and press Enter:
-     ```
-     winget install DEVCOM.Lua
-     ```
-2. Close and reopen PowerShell after it finishes installing.
-3. Confirm it worked by typing:
-   ```
-   lua -v
-   ```
-   You should see a version number printed (e.g. `Lua 5.4.6`). If you see an
-   error instead, restart your computer and try again — sometimes Windows
-   needs a restart to pick up newly installed programs.
+1. Go to https://luabinaries.sourceforge.net/ and install **Lua 5.5.0**.
+2. Use Extract All on the downloaded zip, and then right-click on the folder directly, click **Copy As Path**
+3. Open the Windows **Start Menu** and search *"Edit the System Environment Variables"*, then open it.
+4. Click on **Environment Variables** and locate **PATH**, then click edit
+5. Add a new row to your path, and paste the copied path in. (Remove the quotation marks)
+6. Click the **OK** button on all the paths you opened earlier.
+7. Open Powershell and confirmed it worked with either lua -v or lua55 -v
 
 ### Mac
 
@@ -68,7 +60,7 @@ installed to run it. Pick your operating system below.
 Open a terminal and run the install command for your distro, e.g. on
 Ubuntu/Debian:
 ```
-sudo apt-get install lua5.4
+sudo apt-get install lua5.5
 ```
 Then confirm with `lua -v`.
 
@@ -78,14 +70,14 @@ Then confirm with `lua -v`.
 2. Navigate into the folder you unzipped in Step 1. If the folder is on
    your Desktop and called `termhack`, that looks like:
    ```
-   cd Desktop/termhack
+   cd C:\Desktop\termhack
    ```
    (Tip: you can type `cd ` with a trailing space, then drag the folder
    from your file explorer straight into the terminal window — it'll
    fill in the path for you.)
 3. Start the game:
    ```
-   lua main.lua
+   lua main.lua (or lua55 main.lua)
    ```
 4. Follow the on-screen prompts to play.
 
@@ -94,9 +86,10 @@ Then confirm with `lua -v`.
 ## Troubleshooting
 
 **"lua: command not found" or "'lua' is not recognized"**
-Lua isn't installed, or your terminal doesn't know where it is yet. Close
-the terminal completely, reopen it, and try `lua -v` again. If it still
-fails, redo Step 2.
+Lua isn't installed, or it is not added to your PATH.
+Try lua55 -v, if nothing responds then double check
+you confirmed all the download steps.
+
 
 **"cannot open main.lua: No such file or directory"**
 You're not in the right folder. Run `ls` (Mac/Linux) or `dir` (Windows) to
@@ -115,10 +108,11 @@ If you already have Lua and git set up:
 ```bash
 git clone https://github.com/tarkindev/termhack.git
 cd termhack
-lua main.lua
+lua main.lua (or lua55 main.lua)
 ```
 
 Project structure:
-- `main.lua` — entry point and game modes (manual/random)
+- `main.lua` — entry point and game modes (manual/story)
 - `engine.lua` — puzzle state, attempts, win/lose logic
 - `puzzles.lua` — puzzle content (titles, prompts, answer checks)
+- `ui.lua` - text library used for stylization (text colors, seperators, node map)
