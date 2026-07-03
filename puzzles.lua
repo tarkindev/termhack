@@ -1,3 +1,8 @@
+-- Puzzles storage
+-- Yes, you can technically check here for all the answers
+-- You're lame if you do
+-- get out bro you're hella annoying
+
 local function normalize(s)
     return s:lower():gsub("^%s+", ""):gsub("%s+$", "")
 end
