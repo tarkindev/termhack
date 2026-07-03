@@ -4,24 +4,24 @@ engine.Nodes = {}
 engine.CompletedNodes = {}
 
 local function takeGuess(self)
-    Write_Console("Attempt ".. tostring(self.CURRENT_ATTEMPT + 1).."\n")
-    Write_Console("Enter your guess: ")
-    local guess = tostring(io.read("l"))
+    while true do
+        Write_Console("Attempt ".. tostring(self.CURRENT_ATTEMPT + 1).."\n")
+        Write_Console("Enter your guess: ")
+        local guess = tostring(io.read("l"))
 
-    if self.CHECK_FUNCTION(guess) then
-        table.insert(engine.CompletedNodes, self)
+        if self.CHECK_FUNCTION(guess) then
+            table.insert(engine.CompletedNodes, self)
 
-        Write_Console("Correct Answer..\n")
-        Write_Console("Node has been shutdown!\n")
-        Write_Console("You have just completed Node ".. tostring(#engine.CompletedNodes).. ".\n")
-        return true
-    else
+            Write_Console("Correct Answer..\n")
+            Write_Console("Node has been shutdown!\n")
+            Write_Console("You have just completed Node ".. tostring(#engine.CompletedNodes).. ".\n")
+            return true
+        end
+
         Write_Console("Wrong answer..\n")
         self.CURRENT_ATTEMPT = self.CURRENT_ATTEMPT + 1
         if self.CURRENT_ATTEMPT >= self.NODE_ATTEMPTS then
             return false
-        else
-            takeGuess(self)
         end
     end
 end
