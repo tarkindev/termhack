@@ -45,8 +45,8 @@ local function main()
         manualMode()
     elseif mode == "n" then
         Write_Console("You have selected the regular mode of the game. You'll go through every puzzle in a random order.\n")
+        local index = 1
         while #puzzles ~= 0 do
-            local index = math.random(1, #puzzles)
             local puzzle = puzzles[index]
             engine:load_node(puzzle)
             local result = engine:present_node(puzzle.Title)
@@ -57,6 +57,8 @@ local function main()
                 engine:game_over()
                 return
             end
+
+            index = index + 1
         end
         engine:win_game()
     else
