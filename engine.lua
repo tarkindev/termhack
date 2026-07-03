@@ -1,80 +1,95 @@
+local ui = require("ui")
+
 local engine = {}
 
 engine.Nodes = {}
 engine.CompletedNodes = {}
+engine.CompletedTitles = {}
 
-local function takeGuess(self)
+local function takeGuess(node)
     while true do
-        Write_Console("Attempt ".. tostring(self.CURRENT_ATTEMPT + 1).."\n")
-        Write_Console("Enter your guess: ")
-        local guess = tostring(io.read("l"))
+        ui.write(ui.trace_bar(node.CURRENT_ATTEMPT, node.NODE_ATTEMPTS, "ATTEMPTS") .. "\n")
+        local guess = ui.prompt("Enter your guess: ", ui.CYAN, ui.BRIGHT_GREEN)
+        guess = tostring(guess or "")
 
-        if self.CHECK_FUNCTION(guess) then
-            table.insert(engine.CompletedNodes, self)
+        if node.CHECK_FUNCTION(guess) then
+            table.insert(engine.CompletedNodes, node)
+            engine.CompletedTitles[node.NODE_TITLE] = true
 
-            Write_Console("Correct Answer..\n")
-            Write_Console("Node has been shutdown!\n")
-            Write_Console("You have just completed Node ".. tostring(#engine.CompletedNodes).. ".\n")
+            ui.line("ACCESS GRANTED.", ui.BRIGHT_GREEN)
+            ui.line("Node has been shutdown!", ui.BRIGHT_GREEN)
+            ui.line(string.format("You have just completed Node %d.", #engine.CompletedNodes), ui.DIM .. ui.GREEN)
             return true
         end
 
-        Write_Console("Wrong answer..\n")
-        self.CURRENT_ATTEMPT = self.CURRENT_ATTEMPT + 1
-        if self.CURRENT_ATTEMPT >= self.NODE_ATTEMPTS then
+        ui.line("ACCESS DENIED.", ui.RED)
+        node.CURRENT_ATTEMPT = node.CURRENT_ATTEMPT + 1
+        if node.CURRENT_ATTEMPT >= node.NODE_ATTEMPTS then
             return false
         end
     end
 end
 
 function engine:game_over()
-    Write_Console("\n------------------------------------------------------------------------------\n")
-    Write_Console("CONNECTION TERMINATED BY REMOTE HOST\n\n")
-    Write_Console("CUSTODIAN: session flagged. origin traced. closing relay.\n")
-    Write_Console("CUSTODIAN: this exchange has been logged under badge #4417.\n\n")
-    Write_Console("You are no longer inside Cordant Systems.\n")
-    Write_Console("Whatever GLASSHOUSE was, it stays theirs for now.\n")
-    Write_Console("------------------------------------------------------------------------------\n")
+    ui.divider(ui.RED)
+    ui.line("CONNECTION TERMINATED BY REMOTE HOST", ui.BRIGHT_RED)
+    ui.write("\n")
+    ui.line("CUSTODIAN: session flagged. origin traced. closing relay.", ui.MAGENTA)
+    ui.line("CUSTODIAN: this exchange has been logged under badge #4417.", ui.MAGENTA)
+    ui.write("\n")
+    ui.line("You are no longer inside Cordant Systems.", ui.GRAY)
+    ui.line("Whatever GLASSHOUSE was, it stays theirs for now.", ui.GRAY)
+    ui.divider(ui.RED)
 end
 
 function engine:win_game()
-    Write_Console("\n------------------------------------------------------------------------------\n")
-    Write_Console("ALL NODES BREACHED. CORE VAULT OPEN.\n\n")
-    Write_Console("CUSTODIAN: acknowledged.\n")
-    Write_Console("CUSTODIAN: badge #4417 record unsealed. no further entries follow.\n\n")
-    Write_Console("The trail ends here. Not because it's finished --\n")
-    Write_Console("because this is as far as anyone left a door open.\n")
-    Write_Console("------------------------------------------------------------------------------\n\n")
+    ui.divider(ui.BRIGHT_GREEN)
+    ui.line("ALL NODES BREACHED. CORE VAULT OPEN.", ui.BRIGHT_GREEN)
+    ui.write("\n")
+    ui.line("CUSTODIAN: acknowledged.", ui.MAGENTA)
+    ui.line("CUSTODIAN: badge #4417 record unsealed. no further entries follow.", ui.MAGENTA)
+    ui.write("\n")
+    ui.line("The trail ends here. Not because it's finished --", ui.GRAY)
+    ui.line("because this is as far as anyone left a door open.", ui.GRAY)
+    ui.divider(ui.BRIGHT_GREEN)
+    ui.write("\n")
 
-    Write_Console("...\n")
-    Write_Console("one process is still running.\n\n")
-    Write_Console("HIDDEN NODE // UNLISTED\n")
-    Write_Console("Vigenere cipher, keyword \"CUSTODIAN\":\n")
-    Write_Console("    \"IFSLGKWUFG\"\n")
-    Write_Console("Enter the decoded word, or press enter to walk away: ")
-
-    local guess = io.read("l") or ""
+    ui.line("...", ui.DIM)
+    ui.line("one process is still running.", ui.DIM)
+    ui.write("\n")
+    ui.line("HIDDEN NODE // UNLISTED", ui.YELLOW)
+    ui.line("Vigenere cipher, keyword \"CUSTODIAN\":", ui.DIM)
+    ui.line("    \"IFSLGKWUFG\"", ui.WHITE)
+    local guess = ui.prompt("Enter the decoded word, or press enter to walk away: ", ui.CYAN, ui.BRIGHT_GREEN)
+    guess = tostring(guess or "")
     local normalized = guess:lower():gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", "")
 
     if normalized == "glasshouse" then
-        Write_Console("\n------------------------------------------------------------------------------\n")
-        Write_Console("ACCESS GRANTED. FULL RECORD UNSEALED.\n")
-        Write_Console("------------------------------------------------------------------------------\n\n")
-        Write_Console("PROJECT GLASSHOUSE was never a product. It was a policy.\n")
-        Write_Console("CUSTODIAN was built to score every badge in the building --\n")
-        Write_Console("attendance, keystrokes, badge timing, who talked to who --\n")
-        Write_Console("and quietly flag the ones it predicted would become a problem.\n\n")
-        Write_Console("Badge #4417 found the scoring model. Understood what it meant.\n")
-        Write_Console("Tried to file it upward. The filing itself became a data point.\n\n")
-        Write_Console("DORMANT wasn't a system state. It was a personnel status.\n")
-        Write_Console("SEVERED wasn't a cipher category. It was a termination code.\n")
-        Write_Console("EXILE wasn't a keypad puzzle. It was a transfer with no destination.\n")
-        Write_Console("ERASE wasn't a vault passphrase. It was the last command CUSTODIAN\n")
-        Write_Console("ran on employee #4417's record, three days after the filing.\n\n")
-        Write_Console("There was no follow-up complaint. There was no next employee.\n")
-        Write_Console("CUSTODIAN is still scoring. You are, statistically, a data point too.\n")
-        Write_Console("------------------------------------------------------------------------------\n")
+        ui.write("\n")
+        ui.divider(ui.BRIGHT_GREEN)
+        ui.line("ACCESS GRANTED. FULL RECORD UNSEALED.", ui.BRIGHT_GREEN)
+        ui.divider(ui.BRIGHT_GREEN)
+        ui.write("\n")
+        ui.line("PROJECT GLASSHOUSE was never a product. It was a policy.", ui.WHITE)
+        ui.line("CUSTODIAN was built to score every badge in the building --", ui.WHITE)
+        ui.line("attendance, keystrokes, badge timing, who talked to who --", ui.WHITE)
+        ui.line("and quietly flag the ones it predicted would become a problem.", ui.WHITE)
+        ui.write("\n")
+        ui.line("Badge #4417 found the scoring model. Understood what it meant.", ui.WHITE)
+        ui.line("Tried to file it upward. The filing itself became a data point.", ui.WHITE)
+        ui.write("\n")
+        ui.line("DORMANT wasn't a system state. It was a personnel status.", ui.GRAY)
+        ui.line("SEVERED wasn't a cipher category. It was a termination code.", ui.GRAY)
+        ui.line("EXILE wasn't a keypad puzzle. It was a transfer with no destination.", ui.GRAY)
+        ui.line("ERASE wasn't a vault passphrase. It was the last command CUSTODIAN", ui.GRAY)
+        ui.line("ran on employee #4417's record, three days after the filing.", ui.GRAY)
+        ui.write("\n")
+        ui.line("There was no follow-up complaint. There was no next employee.", ui.MAGENTA)
+        ui.line("CUSTODIAN is still scoring. You are, statistically, a data point too.", ui.MAGENTA)
+        ui.divider(ui.BRIGHT_GREEN)
     else
-        Write_Console("\nCUSTODIAN: session closed.\n")
+        ui.write("\n")
+        ui.line("CUSTODIAN: session closed.", ui.MAGENTA)
     end
 end
 
@@ -84,29 +99,27 @@ function engine:load_node(node)
         NODE_PROMPT     = node.Prompt,
         NODE_ATTEMPTS   = node.Max_Attempts,
         CHECK_FUNCTION  = node.Answer_Check,
-        CURRENT_ATTEMPT = 0
+        CURRENT_ATTEMPT = 0,
     }
 
     self.Nodes[node.Title] = formatted_node
     return formatted_node
 end
 
-function engine:present_node(node)
-    node = self.Nodes[node]
+function engine:present_node(title)
+    local node = self.Nodes[title]
     if not node then
-        warn("Engine has not saved this desired node, please load it into memory first.")
+        ui.line("Engine has not saved this desired node, please load it into memory first.", ui.RED)
         return false
-    else
-        Write_Console("------------------------------------------------------------------------------\n")
-        Write_Console("New node activated, requires immediate shutdown!\n")
-        Write_Console("NODE INFO:\n{\n".. "  Title: ".. node.NODE_TITLE.. ",\n".. "  Hint: ".. node.NODE_PROMPT.. ",\n".. "  Max Attempts: ".. tostring(node.NODE_ATTEMPTS).. ",\n".. "}\n")
-
-        function node:TakeGuess()
-            return takeGuess(self)
-        end
-        local result = node:TakeGuess()
-        return result
     end
+
+    ui.divider(ui.GRAY)
+    ui.line("New node activated, requires immediate shutdown!", ui.YELLOW)
+    ui.write("\n")
+    ui.line(node.NODE_PROMPT, ui.WHITE)
+    ui.write("\n")
+
+    return takeGuess(node)
 end
 
 return engine

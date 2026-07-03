@@ -1,68 +1,79 @@
-local puzzles = require("puzzles")
-local engine  = require("engine")
-
-function Wait(t) 
-    local start = os.time() 
-    repeat until os.time() > start + t
-end
-
-function Write_Console(txt)
-    io.write(txt)
-    Wait(0.4)
-end
+local ui       = require("ui")
+local puzzles  = require("puzzles")
+local engine   = require("engine")
 
 local function manualMode()
-    for index, value in ipairs(puzzles) do
-        if index ~= #puzzles then
-            print("[".. tostring(index).. "]: ".. value.Title.. "\n")
-        else
-            print("[".. tostring(index).. "]: ".. value.Title)
-        end
-    end
-    Write_Console("Please enter the desired puzzle [number]: ")
-    local puzzle = tonumber(io.read("l"))
-    if puzzles[puzzle] then
-        local unformated_puzzle = puzzles[puzzle]
-        engine:load_node(unformated_puzzle)
-        local result = engine:present_node(unformated_puzzle.Title)
-        Write_Console("Would you like to try another puzzle? [y/n]: ")
-        local mode = io.read("l")
+    ui.write("\n")
+    ui.node_map(puzzles, engine.CompletedTitles, nil)
+    ui.write("\n")
 
-        if mode == "y" then manualMode() end
-    else
-        Write_Console("Invalid puzzle.")
+    for index, value in ipairs(puzzles) do
+        local marker = engine.CompletedTitles[value.Title] and ui.c(ui.BRIGHT_GREEN, "[X]") or ui.c(ui.GRAY, "[ ]")
+        ui.line(string.format("%s [%d]: %s", marker, index, value.Title))
     end
+    ui.write("\n")
+
+    local input = ui.prompt("Please enter the desired puzzle [number]: ", ui.CYAN, ui.BRIGHT_GREEN)
+    local puzzle_index = tonumber(input)
+
+    if puzzles[puzzle_index] then
+        local chosen = puzzles[puzzle_index]
+        engine:load_node(chosen)
+        engine:present_node(chosen.Title)
+
+        local again = ui.prompt("Would you like to try another puzzle? [y/n]: ", ui.CYAN, ui.BRIGHT_GREEN)
+        if again == "y" then manualMode() end
+    else
+        ui.line("Invalid puzzle.", ui.RED)
+        manualMode()
+    end
+end
+
+local function storyMode()
+    local remaining = {}
+    for _, p in ipairs(puzzles) do
+        table.insert(remaining, p)
+    end
+    
+    local iterator = 1
+
+    while #remaining ~= 0 do
+        ui.write("\n")
+        ui.node_map(puzzles, engine.CompletedTitles, nil)
+        ui.write("\n")
+
+        local puzzle = remaining[iterator]
+
+        engine:load_node(puzzle)
+        local result = engine:present_node(puzzle.Title)
+
+        table.remove(remaining, iterator)
+
+        if not result then
+            engine:game_over()
+            return
+        end
+
+    end
+    engine:win_game()
 end
 
 local function main()
-    Write_Console("Welcome to termhack, a terminal hacking simulator made and ran with lua.\n")
-    Write_Console("------------------------------------------------------------------------------\n")
-    Write_Console("You will now have a couple options to edit your game.\n")
-    Write_Console("Would you like to enter manual mode, where you are able to select your desired puzzle? [y/n]:  ")
-    local mode = io.read("l")
+    ui.banner()
+    ui.write("\n")
+    ui.line("You will now have a couple options to edit your game.", ui.WHITE)
+    local mode = ui.prompt(
+        "Would you like to enter manual mode, where you are able to select your desired puzzle? [y/n]: ",
+        ui.CYAN, ui.BRIGHT_GREEN)
+
     if mode == "y" then
-        Write_Console("Welcome to manual mode. Here is the list of puzzles.\n")
+        ui.line("Welcome to manual mode. Here is the list of puzzles.", ui.WHITE)
         manualMode()
     elseif mode == "n" then
-        Write_Console("You have selected the regular mode of the game. You'll go through every puzzle in a random order.\n")
-        local index = 1
-        while #puzzles ~= 0 do
-            local puzzle = puzzles[index]
-            engine:load_node(puzzle)
-            local result = engine:present_node(puzzle.Title)
-
-            table.remove(puzzles, index)
-
-            if not result then 
-                engine:game_over()
-                return
-            end
-
-            index = index + 1
-        end
-        engine:win_game()
+        ui.line("You have selected the regular mode of the game. You'll go through every puzzle in story-based order.", ui.WHITE)
+        storyMode()
     else
-        print(mode.. " is not a valid answer, please type y or n.")
+        ui.line(mode .. " is not a valid answer, please type y or n.", ui.RED)
     end
 end
 
