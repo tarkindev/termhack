@@ -31,29 +31,25 @@ end
 
 local function storyMode()
     local remaining = {}
-    for _, p in ipairs(puzzles) do
-        table.insert(remaining, p)
-    end
-    
-    local iterator = 1
+    for _, p in ipairs(puzzles) do remaining[#remaining+1] = p end
+    math.randomseed(os.time())
 
     while #remaining ~= 0 do
         ui.write("\n")
         ui.node_map(puzzles, engine.CompletedTitles, nil)
         ui.write("\n")
 
-        local puzzle = remaining[iterator]
-
+        local index = math.random(1, #remaining)
+        local puzzle = remaining[1]
         engine:load_node(puzzle)
         local result = engine:present_node(puzzle.Title)
 
-        table.remove(remaining, iterator)
+        table.remove(remaining, 1)
 
         if not result then
             engine:game_over()
             return
         end
-
     end
     engine:win_game()
 end
@@ -70,7 +66,7 @@ local function main()
         ui.line("Welcome to manual mode. Here is the list of puzzles.", ui.WHITE)
         manualMode()
     elseif mode == "n" then
-        ui.line("You have selected the regular mode of the game. You'll go through every puzzle in story-based order.", ui.WHITE)
+        ui.line("You have selected the regular mode of the game. You'll go through every puzzle in order.", ui.WHITE)
         storyMode()
     else
         ui.line(mode .. " is not a valid answer, please type y or n.", ui.RED)
